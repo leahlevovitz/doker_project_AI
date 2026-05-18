@@ -1,0 +1,28 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      SA_PASSWORD: "Your_password123"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: server_API/server_API/Dockerfile
+    ports:
+      - "5000:8080"
+    depends_on:
+      - redis
+      - db
+    environment:
+      - Redis__ConnectionString=redis:6379
+      - ConnectionStrings__DefaultConnection=Server=db,1433;Database=Chinese_auction;User=sa;Password=Your_password123;TrustServerCertificate=True;

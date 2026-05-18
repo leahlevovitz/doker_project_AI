@@ -1,0 +1,51 @@
+2026-01-23 02:11:58.877 +02:00 [INF] Executed DbCommand (38ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [u].[Id], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role], [u].[UserName], [u].[adress], [u].[phone]
+FROM [Users] AS [u]
+2026-01-23 02:11:59.245 +02:00 [INF] Executed DbCommand (6ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Users] AS [u]
+        WHERE [u].[Role] = N'manager') THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+2026-01-23 02:11:59.402 +02:00 [INF] User profile is available. Using 'C:\Users\l0583\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-01-23 02:11:59.643 +02:00 [INF] Now listening on: https://localhost:7105
+2026-01-23 02:11:59.647 +02:00 [INF] Now listening on: http://localhost:5036
+2026-01-23 02:12:05.441 +02:00 [INF] Executed DbCommand (26ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [u].[Id], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role], [u].[UserName], [u].[adress], [u].[phone]
+FROM [Users] AS [u]
+2026-01-23 02:12:05.819 +02:00 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Users] AS [u]
+        WHERE [u].[Role] = N'manager') THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+2026-01-23 02:12:06.003 +02:00 [INF] User profile is available. Using 'C:\Users\l0583\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-01-23 02:12:06.505 +02:00 [INF] Now listening on: https://localhost:7105
+2026-01-23 02:12:06.508 +02:00 [INF] Now listening on: http://localhost:5036
+2026-01-23 02:12:07.064 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-01-23 02:12:07.068 +02:00 [INF] Hosting environment: Development
+2026-01-23 02:12:07.071 +02:00 [INF] Content root path: C:\Users\l0583\Desktop\‏‏פרויקט מכירה סינית כיתה - עותק\server_API\server_API
+2026-01-23 02:12:07.159 +02:00 [INF] Request starting HTTP/2 GET https://localhost:7105/swagger/index.html - -
+2026-01-23 02:12:07.479 +02:00 [ERR] An unhandled exception has occurred while executing the request.
+System.MissingMethodException: Method not found: 'Void System.Text.Json.Serialization.Metadata.JsonObjectInfoValues`1.set_ObjectCreator(System.Func`1<!0>)'.
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIOptionsJsonContext.Create_ConfigObject(JsonSerializerOptions options, Boolean makeReadOnly)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIOptionsJsonContext.get_ConfigObject()
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.GetIndexArguments()
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.RespondWithIndexHtml(HttpResponse response)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Microsoft.AspNetCore.Diagnostics.StatusCodePagesMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+2026-01-23 02:12:07.722 +02:00 [ERR] HTTP GET /swagger/index.html responded 500 in 288.1825 ms
+2026-01-23 02:12:07.740 +02:00 [INF] Request starting HTTP/2 GET https://localhost:7105/_framework/aspnetcore-browser-refresh.js - -
+2026-01-23 02:12:07.741 +02:00 [INF] Request starting HTTP/2 GET https://localhost:7105/_vs/browserLink - -
+2026-01-23 02:12:07.742 +02:00 [INF] Request finished HTTP/2 GET https://localhost:7105/swagger/index.html - - - 500 - text/html;+charset=utf-8 588.7375ms
+2026-01-23 02:12:07.790 +02:00 [INF] Request finished HTTP/2 GET https://localhost:7105/_framework/aspnetcore-browser-refresh.js - - - 200 16505 application/javascript;+charset=utf-8 47.8263ms
+2026-01-23 02:12:07.897 +02:00 [INF] Request finished HTTP/2 GET https://localhost:7105/_vs/browserLink - - - 200 - text/javascript;+charset=UTF-8 155.6619ms
+2026-01-23 02:12:07.924 +02:00 [INF] Request starting HTTP/2 GET https://localhost:7105/favicon.ico - -
+2026-01-23 02:12:08.156 +02:00 [INF] HTTP GET /favicon.ico responded 404 in 228.0206 ms
+2026-01-23 02:12:08.172 +02:00 [INF] Request finished HTTP/2 GET https://localhost:7105/favicon.ico - - - 404 - application/problem+json 247.4261ms
