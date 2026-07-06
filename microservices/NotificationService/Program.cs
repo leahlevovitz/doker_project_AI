@@ -23,8 +23,7 @@ builder.Services.AddSingleton(sp =>
 builder.Services.AddSingleton(new RabbitMqConnectionFactory(rabbitHost));
 builder.Services.AddHostedService<OrderStatusConsumer>();
 
-builder.Services.AddHealthChecks()
-    .AddMongoDb(mongoConnectionString, name: "mongodb");
+builder.Services.AddHealthChecks();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

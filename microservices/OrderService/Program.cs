@@ -27,8 +27,7 @@ builder.Services.AddSingleton(new RabbitMqConnectionFactory(rabbitHost));
 builder.Services.AddSingleton<OrderEventPublisher>();
 builder.Services.AddHostedService<InventoryResponseConsumer>();
 
-builder.Services.AddHealthChecks()
-    .AddSqlServer(connectionString, name: "sqlserver");
+builder.Services.AddHealthChecks();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

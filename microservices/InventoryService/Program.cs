@@ -21,8 +21,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer
 builder.Services.AddSingleton(new RabbitMqConnectionFactory(rabbitHost));
 builder.Services.AddHostedService<OrderPlacedConsumer>();
 
-builder.Services.AddHealthChecks()
-    .AddRedis(redisConnection, name: "redis");
+builder.Services.AddHealthChecks();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

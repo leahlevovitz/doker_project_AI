@@ -24,9 +24,7 @@ builder.Services.AddSingleton(sp =>
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConnection));
 builder.Services.AddSingleton<GiftCacheService>();
 
-builder.Services.AddHealthChecks()
-    .AddMongoDb(mongoConnectionString, name: "mongodb")
-    .AddRedis(redisConnection, name: "redis");
+builder.Services.AddHealthChecks();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
