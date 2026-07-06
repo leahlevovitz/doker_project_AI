@@ -49,15 +49,15 @@ public class OrderStatusConsumer : BackgroundService
                 {
                     var evt = JsonSerializer.Deserialize<OrderConfirmedEvent>(body)!;
                     _logger.LogInformation(
-                        "[NotificationService] ✅ ORDER CONFIRMED — PurchaseId={Id} GiftId={GiftId} UserId={UserId}. Notifying user.",
-                        evt.PurchaseId, evt.GiftId, evt.UserId);
+                        "[NotificationService] ✅ ORDER CONFIRMED — PurchaseId={Id} GiftId={GiftId} UserId={UserId} CorrelationId={CorrelationId}. Notifying user.",
+                        evt.PurchaseId, evt.GiftId, evt.UserId, evt.CorrelationId);
                 }
                 else if (routingKey == "order.cancelled")
                 {
                     var evt = JsonSerializer.Deserialize<OrderCancelledEvent>(body)!;
                     _logger.LogWarning(
-                        "[NotificationService] ❌ ORDER CANCELLED — PurchaseId={Id} GiftId={GiftId} UserId={UserId} Reason={Reason}. Notifying user.",
-                        evt.PurchaseId, evt.GiftId, evt.UserId, evt.Reason);
+                        "[NotificationService] ❌ ORDER CANCELLED — PurchaseId={Id} GiftId={GiftId} UserId={UserId} Reason={Reason} CorrelationId={CorrelationId}. Notifying user.",
+                        evt.PurchaseId, evt.GiftId, evt.UserId, evt.Reason, evt.CorrelationId);
                 }
 
                 _channel.BasicAck(ea.DeliveryTag, false);

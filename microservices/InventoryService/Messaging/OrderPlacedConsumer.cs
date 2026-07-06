@@ -52,22 +52,24 @@ public class OrderPlacedConsumer : BackgroundService
                     return;
                 }
 
-                _logger.LogInformation("[InventoryService] Received OrderPlaced PurchaseId={Id} GiftId={GiftId}", evt.PurchaseId, evt.GiftId);
+                _logger.LogInformation("[InventoryService] Received OrderPlaced PurchaseId={Id} GiftId={GiftId} CorrelationId={CorrelationId}",
+                    evt.PurchaseId, evt.GiftId, evt.CorrelationId);
 
                 var key = $"gift:{evt.GiftId}:quantity";
                 var newQty = await _redis.StringDecrementAsync(key);
 
                 if (newQty < 0)
                 {
-                    // Rollback
                     await _redis.StringIncrementAsync(key);
-                    _logger.LogWarning("[InventoryService] Out of stock GiftId={GiftId}, publishing InventoryRejected", evt.GiftId);
-                    Publish(new InventoryRejectedEvent(Guid.NewGuid(), evt.PurchaseId, evt.GiftId, evt.UserId, "Out of stock"), "inventory.rejected");
+                    _logger.LogWarning("[InventoryService] Out of stock GiftId={GiftId} CorrelationId={CorrelationId}, publishing InventoryRejected",
+                        evt.GiftId, evt.CorrelationId);
+                    Publish(new InventoryRejectedEvent(Guid.NewGuid(), evt.CorrelationId, evt.PurchaseId, evt.GiftId, evt.UserId, "Out of stock"), "inventory.rejected");
                 }
                 else
                 {
-                    _logger.LogInformation("[InventoryService] Reserved GiftId={GiftId} remaining={Qty}, publishing InventoryReserved", evt.GiftId, newQty);
-                    Publish(new InventoryReservedEvent(Guid.NewGuid(), evt.PurchaseId, evt.GiftId, evt.UserId), "inventory.reserved");
+                    _logger.LogInformation("[InventoryService] Reserved GiftId={GiftId} remaining={Qty} CorrelationId={CorrelationId}, publishing InventoryReserved",
+                        evt.GiftId, newQty, evt.CorrelationId);
+                    Publish(new InventoryReservedEvent(Guid.NewGuid(), evt.CorrelationId, evt.PurchaseId, evt.GiftId, evt.UserId), "inventory.reserved");
                 }
 
                 // Mark as processed (TTL 24h for idempotency)

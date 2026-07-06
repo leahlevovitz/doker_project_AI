@@ -2,6 +2,14 @@ services:
 
   # ── Infrastructure ───────────────────────────────────────────────────────────
 
+  seq:
+    image: datalust/seq:latest
+    ports:
+      - "5341:5341"
+      - "8081:80"
+    environment:
+      ACCEPT_EULA: "Y"
+
   rabbitmq:
     image: rabbitmq:3-management-alpine
     ports:
@@ -48,9 +56,16 @@ services:
       - MongoDB__ConnectionString=mongodb://mongo:27017
       - MongoDB__DatabaseName=ChineseAuction
       - Redis__ConnectionString=redis:6379
+      - Seq__ServerUrl=http://seq:5341
     depends_on:
       - mongo
       - redis
+      - seq
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   product-catalog-2:
     build:
@@ -60,9 +75,16 @@ services:
       - MongoDB__ConnectionString=mongodb://mongo:27017
       - MongoDB__DatabaseName=ChineseAuction
       - Redis__ConnectionString=redis:6379
+      - Seq__ServerUrl=http://seq:5341
     depends_on:
       - mongo
       - redis
+      - seq
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   inventory:
     build:
@@ -71,11 +93,19 @@ services:
     environment:
       - Redis__ConnectionString=redis:6379
       - RabbitMQ__Host=rabbitmq
+      - Seq__ServerUrl=http://seq:5341
     depends_on:
       rabbitmq:
         condition: service_healthy
       redis:
         condition: service_started
+      seq:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   order:
     build:
@@ -84,11 +114,19 @@ services:
     environment:
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=OrdersDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True
       - RabbitMQ__Host=rabbitmq
+      - Seq__ServerUrl=http://seq:5341
     depends_on:
       rabbitmq:
         condition: service_healthy
       sqlserver:
         condition: service_started
+      seq:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   notification:
     build:
@@ -98,11 +136,19 @@ services:
       - MongoDB__ConnectionString=mongodb://mongo:27017
       - MongoDB__DatabaseName=ChineseAuction
       - RabbitMQ__Host=rabbitmq
+      - Seq__ServerUrl=http://seq:5341
     depends_on:
       rabbitmq:
         condition: service_healthy
       mongo:
         condition: service_started
+      seq:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   # ── Load Balancer (Nginx) ─────────────────────────────────────────────────────
 

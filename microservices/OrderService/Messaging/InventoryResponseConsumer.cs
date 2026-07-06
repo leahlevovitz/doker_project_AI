@@ -54,7 +54,6 @@ public class InventoryResponseConsumer : BackgroundService
                 if (routingKey == "inventory.reserved")
                 {
                     var evt = JsonSerializer.Deserialize<InventoryReservedEvent>(body)!;
-                    // Idempotency: skip if already processed
                     using var scope = _scopeFactory.CreateScope();
                     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                     var purchase = await db.Purchases.FindAsync(evt.PurchaseId);
@@ -66,8 +65,9 @@ public class InventoryResponseConsumer : BackgroundService
                     }
                     purchase.Status = "Confirmed";
                     await db.SaveChangesAsync();
-                    _logger.LogInformation("[OrderService] Order CONFIRMED PurchaseId={Id} GiftId={GiftId}", evt.PurchaseId, evt.GiftId);
-                    _publisher.Publish(new OrderConfirmedEvent(Guid.NewGuid(), evt.PurchaseId, evt.GiftId, evt.UserId), "order.confirmed");
+                    _logger.LogInformation("[OrderService] Order CONFIRMED PurchaseId={Id} GiftId={GiftId} CorrelationId={CorrelationId}",
+                        evt.PurchaseId, evt.GiftId, evt.CorrelationId);
+                    _publisher.Publish(new OrderConfirmedEvent(Guid.NewGuid(), evt.CorrelationId, evt.PurchaseId, evt.GiftId, evt.UserId), "order.confirmed");
                 }
                 else if (routingKey == "inventory.rejected")
                 {
@@ -83,8 +83,9 @@ public class InventoryResponseConsumer : BackgroundService
                     }
                     purchase.Status = "Cancelled";
                     await db.SaveChangesAsync();
-                    _logger.LogWarning("[OrderService] Order CANCELLED PurchaseId={Id} Reason={Reason}", evt.PurchaseId, evt.Reason);
-                    _publisher.Publish(new OrderCancelledEvent(Guid.NewGuid(), evt.PurchaseId, evt.GiftId, evt.UserId, evt.Reason), "order.cancelled");
+                    _logger.LogWarning("[OrderService] Order CANCELLED PurchaseId={Id} Reason={Reason} CorrelationId={CorrelationId}",
+                        evt.PurchaseId, evt.Reason, evt.CorrelationId);
+                    _publisher.Publish(new OrderCancelledEvent(Guid.NewGuid(), evt.CorrelationId, evt.PurchaseId, evt.GiftId, evt.UserId, evt.Reason), "order.cancelled");
                 }
 
                 _channel.BasicAck(ea.DeliveryTag, false);

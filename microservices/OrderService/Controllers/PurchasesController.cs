@@ -88,18 +88,22 @@ public class PurchasesController : ControllerBase
 
         if (!items.Any()) return BadRequest(new { message = "No pending draft purchases found" });
 
+        var correlationId = Guid.NewGuid();
         foreach (var item in items)
         {
             item.IsDraft = false;
-            // Status stays "Pending" until InventoryService responds
-            _logger.LogInformation("[OrderService] Publishing OrderPlaced PurchaseId={Id} GiftId={GiftId}", item.Id, item.GiftId);
+            using (_logger.BeginScope(new Dictionary<string, object> { ["CorrelationId"] = correlationId }))
+            {
+                _logger.LogInformation("[OrderService] Publishing OrderPlaced PurchaseId={Id} GiftId={GiftId} CorrelationId={CorrelationId}",
+                    item.Id, item.GiftId, correlationId);
+            }
             _publisher.Publish(
-                new OrderPlacedEvent(Guid.NewGuid(), item.Id, item.GiftId, item.UserId, DateTime.UtcNow),
+                new OrderPlacedEvent(Guid.NewGuid(), correlationId, item.Id, item.GiftId, item.UserId, DateTime.UtcNow),
                 "order.placed");
         }
 
         await _db.SaveChangesAsync();
-        return Accepted(new { message = "Order placed, awaiting inventory confirmation", purchaseIds });
+        return Accepted(new { message = "Order placed, awaiting inventory confirmation", purchaseIds, correlationId });
     }
 
     [HttpDelete("{id}")]
