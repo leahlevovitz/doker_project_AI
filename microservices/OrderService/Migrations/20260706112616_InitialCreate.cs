@@ -20,7 +20,8 @@ namespace OrderService.Migrations
                     GiftId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     PurchaseDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsDraft = table.Column<bool>(type: "bit", nullable: false)
+                    IsDraft = table.Column<bool>(type: "bit", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false, defaultValue: "Pending")
                 },
                 constraints: table =>
                 {
