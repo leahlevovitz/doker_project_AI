@@ -2,6 +2,20 @@ services:
 
   # ── Infrastructure ───────────────────────────────────────────────────────────
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   mongo:
     image: mongo:7
     ports:
@@ -33,8 +47,10 @@ services:
     environment:
       - MongoDB__ConnectionString=mongodb://mongo:27017
       - MongoDB__DatabaseName=ChineseAuction
+      - Redis__ConnectionString=redis:6379
     depends_on:
       - mongo
+      - redis
 
   product-catalog-2:
     build:
@@ -43,8 +59,10 @@ services:
     environment:
       - MongoDB__ConnectionString=mongodb://mongo:27017
       - MongoDB__DatabaseName=ChineseAuction
+      - Redis__ConnectionString=redis:6379
     depends_on:
       - mongo
+      - redis
 
   inventory:
     build:
@@ -52,8 +70,12 @@ services:
       dockerfile: Dockerfile
     environment:
       - Redis__ConnectionString=redis:6379
+      - RabbitMQ__Host=rabbitmq
     depends_on:
-      - redis
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   order:
     build:
@@ -61,8 +83,12 @@ services:
       dockerfile: Dockerfile
     environment:
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=OrdersDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True
+      - RabbitMQ__Host=rabbitmq
     depends_on:
-      - sqlserver
+      rabbitmq:
+        condition: service_healthy
+      sqlserver:
+        condition: service_started
 
   notification:
     build:
@@ -71,8 +97,12 @@ services:
     environment:
       - MongoDB__ConnectionString=mongodb://mongo:27017
       - MongoDB__DatabaseName=ChineseAuction
+      - RabbitMQ__Host=rabbitmq
     depends_on:
-      - mongo
+      rabbitmq:
+        condition: service_healthy
+      mongo:
+        condition: service_started
 
   # ── Load Balancer (Nginx) ─────────────────────────────────────────────────────
 

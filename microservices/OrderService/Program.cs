@@ -1,13 +1,20 @@
 using Microsoft.EntityFrameworkCore;
 using OrderService.Data;
+using OrderService.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? "Server=sqlserver;Database=OrdersDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True";
 
+var rabbitHost = builder.Configuration.GetValue<string>("RabbitMQ:Host") ?? "rabbitmq";
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
+
+builder.Services.AddSingleton(new RabbitMqConnectionFactory(rabbitHost));
+builder.Services.AddSingleton<OrderEventPublisher>();
+builder.Services.AddHostedService<InventoryResponseConsumer>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

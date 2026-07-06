@@ -18,4 +18,7 @@ public class Purchase
     public DateTime PurchaseDate { get; set; } = DateTime.UtcNow;
 
     public bool IsDraft { get; set; } = true;
+
+    // Saga status: Pending | Confirmed | Cancelled
+    public string Status { get; set; } = "Pending";
 }
