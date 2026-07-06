@@ -1,28 +1,118 @@
 services:
+
+  # ── Infrastructure ───────────────────────────────────────────────────────────
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
-    restart: unless-stopped
 
-  db:
+  sqlserver:
     image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
-      SA_PASSWORD: "Your_password123"
+      SA_PASSWORD: "YourStrong!Passw0rd"
       ACCEPT_EULA: "Y"
     ports:
-      - "1433:1433"
-    restart: unless-stopped
+      - "1434:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
 
-  api:
+  # ── Microservices ─────────────────────────────────────────────────────────────
+
+  product-catalog-1:
     build:
-      context: .
-      dockerfile: server_API/server_API/Dockerfile
+      context: ./microservices/ProductCatalogService
+      dockerfile: Dockerfile
+    environment:
+      - MongoDB__ConnectionString=mongodb://mongo:27017
+      - MongoDB__DatabaseName=ChineseAuction
+    depends_on:
+      - mongo
+
+  product-catalog-2:
+    build:
+      context: ./microservices/ProductCatalogService
+      dockerfile: Dockerfile
+    environment:
+      - MongoDB__ConnectionString=mongodb://mongo:27017
+      - MongoDB__DatabaseName=ChineseAuction
+    depends_on:
+      - mongo
+
+  inventory:
+    build:
+      context: ./microservices/InventoryService
+      dockerfile: Dockerfile
+    environment:
+      - Redis__ConnectionString=redis:6379
+    depends_on:
+      - redis
+
+  order:
+    build:
+      context: ./microservices/OrderService
+      dockerfile: Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=OrdersDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True
+    depends_on:
+      - sqlserver
+
+  notification:
+    build:
+      context: ./microservices/NotificationService
+      dockerfile: Dockerfile
+    environment:
+      - MongoDB__ConnectionString=mongodb://mongo:27017
+      - MongoDB__DatabaseName=ChineseAuction
+    depends_on:
+      - mongo
+
+  # ── Load Balancer (Nginx) ─────────────────────────────────────────────────────
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./microservices/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - product-catalog-1
+      - product-catalog-2
+
+  # ── BFF ───────────────────────────────────────────────────────────────────────
+
+  bff:
+    build:
+      context: ./microservices/BffService
+      dockerfile: Dockerfile
+    environment:
+      - Services__ProductCatalog=http://product-catalog-1:8080
+      - Services__Order=http://order:8080
+    depends_on:
+      - product-catalog-1
+      - order
+
+  # ── API Gateway (YARP) ────────────────────────────────────────────────────────
+
+  gateway:
+    build:
+      context: ./microservices/ApiGateway
+      dockerfile: Dockerfile
     ports:
       - "5000:8080"
     depends_on:
-      - redis
-      - db
-    environment:
-      - Redis__ConnectionString=redis:6379
-      - ConnectionStrings__DefaultConnection=Server=db,1433;Database=Chinese_auction;User=sa;Password=Your_password123;TrustServerCertificate=True;
+      - product-catalog-1
+      - product-catalog-2
+      - order
+      - inventory
+      - notification
+      - bff
+
+volumes:
+  mongo_data:
+  sql_data:
