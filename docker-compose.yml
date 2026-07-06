@@ -62,10 +62,11 @@ services:
       - redis
       - seq
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   product-catalog-2:
     build:
@@ -81,10 +82,11 @@ services:
       - redis
       - seq
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   inventory:
     build:
@@ -102,10 +104,11 @@ services:
       seq:
         condition: service_started
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   order:
     build:
@@ -123,10 +126,11 @@ services:
       seq:
         condition: service_started
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   notification:
     build:
@@ -145,10 +149,11 @@ services:
       seq:
         condition: service_started
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   # ── Load Balancer (Nginx) ─────────────────────────────────────────────────────
 
