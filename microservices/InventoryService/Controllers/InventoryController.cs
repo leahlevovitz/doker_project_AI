@@ -41,11 +41,14 @@ public class InventoryController : ControllerBase
     [HttpPost("{giftId}/decrement")]
     public async Task<IActionResult> Decrement(int giftId)
     {
-        var current = await _redis.StringGetAsync($"gift:{giftId}:quantity");
-        if (!current.HasValue || (int)current <= 0)
+        var key = $"gift:{giftId}:quantity";
+        var newQty = await _redis.StringDecrementAsync(key);
+        if (newQty < 0)
+        {
+            // Rollback - restore the value
+            await _redis.StringIncrementAsync(key);
             return BadRequest(new { message = "Out of stock" });
-
-        var newQty = await _redis.StringDecrementAsync($"gift:{giftId}:quantity");
+        }
         return Ok(new { GiftId = giftId, Quantity = newQty });
     }
 

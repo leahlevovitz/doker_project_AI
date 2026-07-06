@@ -78,6 +78,8 @@ services:
 
   nginx:
     image: nginx:alpine
+    ports:
+      - "8080:80"
     volumes:
       - ./microservices/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
@@ -104,7 +106,7 @@ services:
       context: ./microservices/ApiGateway
       dockerfile: Dockerfile
     ports:
-      - "5000:8080"
+      - "5050:8080"
     depends_on:
       - product-catalog-1
       - product-catalog-2

@@ -8,11 +8,22 @@ builder.Services.AddReverseProxy()
     {
         if (ctx.Route.ClusterId == "product-catalog-cluster")
         {
-            ctx.AddResponseTransform(async responseCtx =>
+            ctx.AddResponseTransform(responseCtx =>
             {
-                if (responseCtx.ProxyResponse?.Headers.TryGetValues("X-Container-Id", out var values) == true)
-                    responseCtx.HttpContext.Response.Headers["X-Container-Id"] = values.FirstOrDefault();
-                await Task.CompletedTask;
+                var proxyResponse = responseCtx.ProxyResponse;
+                if (proxyResponse != null)
+                {
+                    // Check both response headers and content headers
+                    if (proxyResponse.Headers.TryGetValues("X-Container-Id", out var values))
+                    {
+                        responseCtx.HttpContext.Response.Headers["X-Container-Id"] = values.FirstOrDefault();
+                    }
+                    else if (proxyResponse.Content.Headers.TryGetValues("X-Container-Id", out var contentValues))
+                    {
+                        responseCtx.HttpContext.Response.Headers["X-Container-Id"] = contentValues.FirstOrDefault();
+                    }
+                }
+                return ValueTask.CompletedTask;
             });
         }
     });
