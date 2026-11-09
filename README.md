@@ -2,13 +2,6 @@
 
 > A full **event-driven microservices** back end for an online Chinese auction (raffle) platform, built with **.NET**, **RabbitMQ**, **Redis** and **Docker Compose**, including a **Saga** for distributed orders.
 
-![.NET](https://img.shields.io/badge/.NET-C%23-512BD4?logo=dotnet&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
-![RabbitMQ](https://img.shields.io/badge/RabbitMQ-Saga-FF6600?logo=rabbitmq&logoColor=white)
-![Redis](https://img.shields.io/badge/Redis-Cache_%26_Stock-DC382D?logo=redis&logoColor=white)
-![SQL Server](https://img.shields.io/badge/SQL_Server-EF_Core-CC2927?logo=microsoftsqlserver&logoColor=white)
-![MongoDB](https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white)
-
 ## 🏗️ Architecture
 ```
                     Client
@@ -70,4 +63,4 @@ docker compose up --build
 `Microservices` · `API Gateway` · `BFF pattern` · `Saga (choreography)` · `Event-driven messaging` · `Atomic stock reservation` · `Horizontal scaling + load balancing` · `Distributed caching` · `Centralized logging` · `Docker Compose`
 
 ---
-👩‍💻 Built by **Leah Levovitz** · [LinkedIn](https://www.linkedin.com/in/leahlevovitz) · [GitHub](https://github.com/leahlevovitz)
+👩‍💻 Built by **Leah Levovitz** · [GitHub](https://github.com/leahlevovitz)
